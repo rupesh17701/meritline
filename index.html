@@ -1,0 +1,793 @@
+<title>Meritline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#EEF1F5;
+    --surface:#FFFFFF;
+    --surface-2:#F5F7FA;
+    --text-primary:#101828;
+    --text-secondary:#49536A;
+    --text-muted:#8A93A8;
+    --border:rgba(16,24,40,0.10);
+    --border-strong:rgba(16,24,40,0.18);
+    --grid-line:#E4E8EF;
+    --accent:#B8722A;
+    --accent-strong:#96591C;
+    --accent-wash:rgba(184,114,42,0.12);
+    --accent-ink:#FFFFFF;
+    --good:#0ca30c;
+    --warning:#c98200;
+    --serious:#ec835a;
+    --critical:#d03b3b;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#c98500;
+    --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7;
+    --shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 12px rgba(16,24,40,0.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg:#0A0F1C;
+      --surface:#111a2c;
+      --surface-2:#0E1626;
+      --text-primary:#EAEDF4;
+      --text-secondary:#AEB8CC;
+      --text-muted:#79839B;
+      --border:rgba(255,255,255,0.09);
+      --border-strong:rgba(255,255,255,0.16);
+      --grid-line:#22304A;
+      --accent:#E0954A;
+      --accent-strong:#F0AE6E;
+      --accent-wash:rgba(224,149,74,0.14);
+      --accent-ink:#0A0F1C;
+      --good:#3fc23f;
+      --warning:#fab219;
+      --serious:#ec835a;
+      --critical:#e66767;
+      --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+      --s5:#d55181; --s6:#3fc23f; --s7:#9085e9;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg:#0A0F1C;
+    --surface:#111a2c;
+    --surface-2:#0E1626;
+    --text-primary:#EAEDF4;
+    --text-secondary:#AEB8CC;
+    --text-muted:#79839B;
+    --border:rgba(255,255,255,0.09);
+    --border-strong:rgba(255,255,255,0.16);
+    --grid-line:#22304A;
+    --accent:#E0954A;
+    --accent-strong:#F0AE6E;
+    --accent-wash:rgba(224,149,74,0.14);
+    --accent-ink:#0A0F1C;
+    --good:#3fc23f;
+    --warning:#fab219;
+    --serious:#ec835a;
+    --critical:#e66767;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --s5:#d55181; --s6:#3fc23f; --s7:#9085e9;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 24px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--accent-wash); }
+
+  .page{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 20px 64px;
+  }
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    padding-bottom:20px;
+    margin-bottom:22px;
+    border-bottom:1px solid var(--border);
+  }
+  .brand{ display:flex; flex-direction:column; gap:6px; }
+  .brand-mark{
+    display:flex; align-items:center; gap:9px;
+    font-family:"Archivo", sans-serif;
+    font-weight:800;
+    font-size:26px;
+    letter-spacing:-0.01em;
+  }
+  .brand-mark svg{ flex:none; }
+  .brand-tag{
+    font-size:13px;
+    color:var(--text-secondary);
+    max-width:46ch;
+    line-height:1.45;
+  }
+  .topbar-right{
+    display:flex; flex-direction:column; align-items:flex-end; gap:8px;
+  }
+  .live-badge{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--critical);
+    background:color-mix(in srgb, var(--critical) 10%, transparent);
+    border:1px solid color-mix(in srgb, var(--critical) 30%, transparent);
+    padding:5px 10px 5px 8px;
+    border-radius:100px;
+  }
+  .live-dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--critical);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .live-dot{ animation:none; } }
+  @keyframes pulse{
+    0%,100%{ opacity:1; transform:scale(1); }
+    50%{ opacity:0.45; transform:scale(0.8); }
+  }
+  .asof{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:12px;
+    color:var(--text-muted);
+  }
+
+  /* ---------- section headings ---------- */
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:16px; margin:40px 0 14px;
+  }
+  .section-head h2{
+    font-family:"Archivo", sans-serif;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--text-secondary);
+    margin:0;
+  }
+  .section-head .section-note{
+    font-size:12.5px; color:var(--text-muted);
+  }
+  .section-head::after{ content:""; }
+
+  /* ---------- KPI strip ---------- */
+  .kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:12px;
+  }
+  @media (max-width:960px){ .kpi-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px){ .kpi-grid{ grid-template-columns:1fr; } }
+  .kpi{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px 16px 14px;
+    box-shadow:var(--shadow);
+    display:flex; flex-direction:column; gap:8px;
+    min-width:0;
+  }
+  .kpi-label{
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+    font-weight:500;
+  }
+  .kpi-value{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:26px;
+    font-weight:600;
+    line-height:1.1;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-0.01em;
+  }
+  .kpi-value small{ font-size:14px; font-weight:500; color:var(--text-secondary); }
+  .kpi-delta{
+    font-size:12px;
+    display:inline-flex; align-items:center; gap:4px;
+    font-weight:500;
+  }
+  .kpi-delta.up{ color:var(--critical); }
+  .kpi-delta.down{ color:var(--good); }
+  .kpi-delta.flat{ color:var(--text-muted); }
+  .kpi-sub{ font-size:12px; color:var(--text-muted); line-height:1.4; }
+
+  /* ---------- charts grid ---------- */
+  .charts-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:860px){ .charts-grid{ grid-template-columns:1fr; } }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 20px 18px;
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  .card.full{ grid-column:1 / -1; }
+  .card-head{ margin-bottom:14px; }
+  .card-title{
+    font-family:"Archivo", sans-serif;
+    font-weight:700;
+    font-size:15.5px;
+    margin:0 0 3px;
+    letter-spacing:-0.005em;
+  }
+  .card-sub{ font-size:12.5px; color:var(--text-muted); line-height:1.4; }
+
+  /* ---------- donut ---------- */
+  .donut-wrap{ display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
+  .donut-svg{ flex:none; width:172px; height:172px; }
+  .donut-center-val{
+    font-family:"IBM Plex Mono", monospace;
+    font-weight:600; font-size:19px; fill:var(--text-primary);
+  }
+  .donut-center-lbl{
+    font-family:"IBM Plex Sans", sans-serif;
+    font-size:9.5px; fill:var(--text-muted); letter-spacing:0.04em;
+  }
+  .legend{ flex:1; min-width:190px; display:flex; flex-direction:column; gap:7px; }
+  .legend-row{
+    display:flex; align-items:center; gap:8px; font-size:13px;
+    padding:3px 0;
+  }
+  .swatch{ width:10px; height:10px; border-radius:3px; flex:none; }
+  .legend-label{ color:var(--text-secondary); flex:1; }
+  .legend-val{
+    font-family:"IBM Plex Mono", monospace; font-size:12.5px;
+    font-variant-numeric:tabular-nums; color:var(--text-primary); font-weight:500;
+  }
+  .legend-pct{ font-size:11.5px; color:var(--text-muted); width:40px; text-align:right; }
+
+  /* ---------- horizontal bar rows (regional / mini charts) ---------- */
+  .region-block{ margin-bottom:16px; }
+  .region-block:last-child{ margin-bottom:0; }
+  .region-name{
+    font-size:12.5px; font-weight:600; color:var(--text-primary);
+    margin-bottom:7px; display:flex; justify-content:space-between;
+  }
+  .region-name .region-total{ font-family:"IBM Plex Mono", monospace; font-weight:400; color:var(--text-muted); font-size:11.5px; }
+  .hbar-row{ display:flex; align-items:center; gap:9px; margin-bottom:5px; }
+  .hbar-row:last-child{ margin-bottom:0; }
+  .hbar-label{ font-size:11px; color:var(--text-muted); width:88px; flex:none; }
+  .hbar-track{
+    flex:1; height:9px; background:var(--surface-2); border-radius:5px; overflow:hidden;
+    border:1px solid var(--border);
+  }
+  .hbar-fill{ height:100%; border-radius:5px; transition:width .3s ease; }
+  .hbar-value{
+    font-family:"IBM Plex Mono", monospace; font-size:11.5px; width:78px; text-align:right;
+    flex:none; font-variant-numeric:tabular-nums; color:var(--text-primary);
+  }
+  .mini-legend{ display:flex; gap:16px; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
+  .mini-legend .legend-row{ font-size:12px; }
+
+  /* ---------- line chart ---------- */
+  .line-svg{ width:100%; height:auto; overflow:visible; }
+  .line-tick{ font-family:"IBM Plex Mono", monospace; font-size:10.5px; fill:var(--text-muted); }
+  .line-gridline{ stroke:var(--grid-line); stroke-width:1; }
+  .line-path{ fill:none; stroke:var(--s1); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+  .line-area{ fill:url(#lineFade); }
+  .line-marker{ fill:var(--surface); stroke:var(--s1); stroke-width:2.5; cursor:pointer; }
+  .line-marker.record{ fill:var(--critical); stroke:var(--critical); }
+  .line-annot{ font-family:"IBM Plex Mono", monospace; font-size:10.5px; fill:var(--critical); font-weight:600; }
+
+  /* ---------- tooltip ---------- */
+  #tooltip{
+    position:fixed; pointer-events:none; z-index:50;
+    background:var(--text-primary); color:var(--bg);
+    font-family:"IBM Plex Mono", monospace;
+    font-size:11.5px; line-height:1.5;
+    padding:7px 10px; border-radius:8px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    opacity:0; transform:translate(-50%,-100%) translateY(-8px);
+    transition:opacity .1s ease;
+    white-space:nowrap;
+  }
+  #tooltip.show{ opacity:1; }
+  #tooltip b{ font-weight:600; }
+  #tooltip .tt-lbl{ opacity:0.65; }
+
+  /* ---------- gauge (live snapshot) ---------- */
+  .gauge{ margin-top:6px; }
+  .gauge-track{
+    position:relative; height:14px; border-radius:8px;
+    background:linear-gradient(90deg, var(--good), var(--warning) 55%, var(--critical));
+    opacity:0.85;
+  }
+  .gauge-marker{
+    position:absolute; top:-6px; width:2px; height:26px;
+    background:var(--text-primary); border-radius:1px;
+  }
+  .gauge-marker::after{
+    content:attr(data-label);
+    position:absolute; top:-20px; left:50%; transform:translateX(-50%);
+    font-family:"IBM Plex Mono", monospace; font-size:10.5px; color:var(--text-secondary);
+    white-space:nowrap; font-variant-numeric:tabular-nums;
+  }
+  .gauge-marker.avg{ background:var(--accent); width:3px; height:30px; top:-8px; }
+  .gauge-marker.avg::after{ color:var(--accent-strong); font-weight:600; top:-22px; }
+  .gauge-scale{ display:flex; justify-content:space-between; margin-top:24px; font-size:10.5px; color:var(--text-muted); font-family:"IBM Plex Mono", monospace; }
+
+  /* ---------- stat pairs (exchange snapshot) ---------- */
+  .pair-block{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:520px){ .pair-block{ grid-template-columns:1fr; } }
+  .pair-title{ font-size:11.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:10px; font-weight:500; }
+
+  /* ---------- insights ---------- */
+  .insights-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-left:3px solid var(--accent);
+    border-radius:0 14px 14px 0;
+    padding:22px 24px;
+    box-shadow:var(--shadow);
+  }
+  .insights-card h2{
+    font-family:"Archivo", sans-serif; font-size:14px; font-weight:700;
+    letter-spacing:0.08em; text-transform:uppercase; color:var(--text-secondary);
+    margin:0 0 16px;
+  }
+  .insight-list{ display:grid; grid-template-columns:1fr 1fr; gap:20px 28px; list-style:none; margin:0; padding:0; }
+  @media (max-width:760px){ .insight-list{ grid-template-columns:1fr; } }
+  .insight-list li{
+    font-size:14px; line-height:1.6; color:var(--text-secondary);
+    padding-left:16px; position:relative;
+  }
+  .insight-list li::before{
+    content:""; position:absolute; left:0; top:9px;
+    width:6px; height:6px; border-radius:50%; background:var(--accent);
+  }
+  .insight-list strong{ color:var(--text-primary); font-weight:600; }
+
+  /* ---------- footer / sources ---------- */
+  .sources{
+    margin-top:44px; padding-top:20px; border-top:1px solid var(--border);
+  }
+  .sources h3{
+    font-family:"Archivo", sans-serif; font-size:11.5px; font-weight:700;
+    letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted);
+    margin:0 0 12px;
+  }
+  .source-list{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:6px 24px;
+    list-style:none; margin:0 0 16px; padding:0;
+  }
+  @media (max-width:760px){ .source-list{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:520px){ .source-list{ grid-template-columns:1fr; } }
+  .source-list li{ font-size:11.5px; color:var(--text-muted); line-height:1.6; }
+  .source-list b{ color:var(--text-secondary); font-weight:500; }
+  .colophon{ font-size:11.5px; color:var(--text-muted); line-height:1.7; max-width:74ch; }
+  .colophon a{ color:var(--text-muted); }
+
+  .footnote{ font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.5; }
+</style>
+
+<div class="page">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14.5 1L4 15h7l-1 10L20 11h-7l1.5-10z" fill="var(--accent)"/>
+        </svg>
+        Meritline
+      </div>
+      <div class="brand-tag">An independent market brief on India's power sector — generation mix, demand, and exchange pricing, compiled from public disclosures.</div>
+    </div>
+    <div class="topbar-right">
+      <span class="live-badge"><span class="live-dot"></span> IEX Day-Ahead — Live</span>
+      <span class="asof">As of 24 Aug 2026, 12:00 IST</span>
+    </div>
+  </div>
+
+  <div class="section-head"><h2>Market Snapshot</h2><span class="section-note">National, FY 2025–26 unless noted</span></div>
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="section-head"><h2>Generation &amp; Grid</h2><span class="section-note">Installed capacity as of 31 Mar 2026</span></div>
+  <div class="charts-grid">
+
+    <div class="card">
+      <div class="card-head">
+        <h3 class="card-title">Installed capacity mix</h3>
+        <div class="card-sub">532.7 GW total, by source</div>
+      </div>
+      <div class="donut-wrap">
+        <svg class="donut-svg" viewBox="0 0 172 172" id="donutSvg"></svg>
+        <div class="legend" id="donutLegend"></div>
+      </div>
+      <div class="footnote">"Other" bucket (small-hydro, biomass, waste-to-energy, storage) derived as the residual against CEA's reported total.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 class="card-title">Regional capacity vs. peak demand</h3>
+        <div class="card-sub">Installed capacity against each region's all-time peak-demand record</div>
+      </div>
+      <div id="regionBlocks"></div>
+      <div class="mini-legend">
+        <span class="legend-row"><span class="swatch" style="background:var(--s1)"></span><span class="legend-label">Installed capacity</span></span>
+        <span class="legend-row"><span class="swatch" style="background:var(--s2)"></span><span class="legend-label">Peak demand record</span></span>
+      </div>
+    </div>
+
+    <div class="card full">
+      <div class="card-head">
+        <h3 class="card-title">National peak demand, 2026</h3>
+        <div class="card-sub">Monthly peak demand met (GW) — two new all-time records were set within the same quarter</div>
+      </div>
+      <svg class="line-svg" viewBox="0 0 900 300" id="lineSvg"></svg>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 class="card-title">Power exchange — July 2026</h3>
+        <div class="card-sub">Day-Ahead (DAM) vs. Real-Time (RTM) market, IEX</div>
+      </div>
+      <div class="pair-block">
+        <div>
+          <div class="pair-title">Avg. clearing price (₹/kWh)</div>
+          <div id="priceBars"></div>
+        </div>
+        <div>
+          <div class="pair-title">Traded volume (MU)</div>
+          <div id="volBars"></div>
+        </div>
+      </div>
+      <div class="footnote">DAM price +19.3% YoY, RTM price +15.1% YoY — both markets repriced sharply higher on demand growth. Total IEX volume 13,527 MU, +7.7% YoY.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 class="card-title">Today's Day-Ahead price range</h3>
+        <div class="card-sub">24 Aug 2026 · across all 96 trading blocks</div>
+      </div>
+      <div class="gauge">
+        <div class="gauge-track" id="gaugeTrack"></div>
+        <div class="gauge-scale"><span>₹1.86/unit</span><span>₹10.00/unit (cap)</span></div>
+      </div>
+      <div style="margin-top:30px;">
+        <div class="pair-title">Bid volume, full day (MWh)</div>
+        <div id="bidBars"></div>
+      </div>
+      <div class="footnote">Purchase bids ran ~2× sell bids through evening blocks, pushing prices toward the regulatory ceiling.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 class="card-title">Renewable capacity added, FY 2025–26</h3>
+        <div class="card-sub">54.6 GW added — the largest annual addition on record</div>
+      </div>
+      <div id="addBars"></div>
+      <div class="footnote">Non-fossil sources crossed 50% of total installed capacity in June 2025 — five years ahead of India's 2030 NDC target.</div>
+    </div>
+
+  </div>
+
+  <div class="section-head"><h2>Analyst Notes</h2><span class="section-note">Reading the numbers</span></div>
+  <div class="insights-card">
+    <ul class="insight-list">
+      <li><strong>Evening peak is where the market breaks.</strong> Today's live DAM shows purchase bids running roughly 2× sell bids after sunset, with prices brushing the ₹10/kWh ceiling — solar drops off before demand peaks, and dispatchable capacity is thin exactly when it's needed most.</li>
+      <li><strong>Capacity is keeping pace; flexibility isn't.</strong> Energy shortage was just 0.03% nationally in FY 2025–26 despite record demand, but gas remains under 4% of installed capacity and battery storage is still mostly under construction — the physical-adequacy story is fine, the flexibility story isn't.</li>
+      <li><strong>The grid still leans on long transmission corridors.</strong> The Western region carries the largest installed base (173 GW) while the Northern region set the highest regional peak-demand record (91.2 GW) — synchronized heat events will keep testing inter-regional transfer capacity.</li>
+      <li><strong>Intraday is pricing calmer than day-ahead.</strong> July's RTM average (₹4.41/kWh) sat below DAM (₹4.99/kWh), a spread consistent with better same-day renewable forecasting — a live signal for storage arbitrage and demand-response strategy.</li>
+    </ul>
+  </div>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <ul class="source-list">
+      <li><b>Installed capacity, coal/solar/wind/hydro/gas/nuclear split, FY25-26 additions</b> — Central Electricity Authority; PIB Year-End Review, Ministry of Power</li>
+      <li><b>Peak demand records, monthly figures, regional records</b> — PIB press releases; Grid-India (POSOCO); Power Peak Digest</li>
+      <li><b>IEX DAM/RTM prices &amp; volumes, July 2026</b> — Mercom India market update, citing IEX disclosures</li>
+      <li><b>Live Day-Ahead snapshot</b> — IEX Market Snapshot, iexindia.com, 24 Aug 2026</li>
+      <li><b>Non-fossil 50% milestone, energy shortage %</b> — PIB Year-End Review 2025, Ministry of Power</li>
+      <li><b>Regional installed capacity split</b> — Energy Watch / CEA regional data, late 2025</li>
+    </ul>
+    <p class="colophon">Meritline is an independent analysis exercise compiling publicly reported figures on India's power sector into a single working view — built to demonstrate market-analysis and dashboarding craft for power-market research and consulting roles. Figures are drawn from the sources above as of their publication date and may be revised as official releases update; not for trading or investment use.</p>
+  </div>
+
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+(function(){
+  "use strict";
+  var css = getComputedStyle(document.documentElement);
+  function tok(name){ return css.getPropertyValue(name).trim(); }
+
+  var tooltip = document.getElementById('tooltip');
+  function showTip(evt, html){
+    tooltip.innerHTML = html;
+    tooltip.classList.add('show');
+    moveTip(evt);
+  }
+  function moveTip(evt){
+    tooltip.style.left = evt.clientX + 'px';
+    tooltip.style.top = (evt.clientY - 10) + 'px';
+  }
+  function hideTip(){ tooltip.classList.remove('show'); }
+
+  function fmt(n, d){
+    d = d === undefined ? 1 : d;
+    return n.toLocaleString('en-IN', {minimumFractionDigits:d, maximumFractionDigits:d});
+  }
+
+  /* ================= KPI STRIP ================= */
+  var kpis = [
+    { label:'All-time peak demand', value:'270.7', unit:'GW', delta:'21 May 2026 · heatwave record', deltaClass:'flat' },
+    { label:'Installed capacity', value:'532.7', unit:'GW', delta:'+65 GW added in FY25–26', deltaClass:'down' },
+    { label:'Non-fossil share', value:'53.2', unit:'%', delta:'crossed 50% in Jun 2025', deltaClass:'down' },
+    { label:'Energy shortage, FY25–26', value:'0.03', unit:'%', delta:'national average', deltaClass:'flat' },
+    { label:'Live DAM price', value:'₹7.30', unit:'/unit', delta:'vs ₹4.99 Jul avg', deltaClass:'up' }
+  ];
+  var kpiGrid = document.getElementById('kpiGrid');
+  kpis.forEach(function(k){
+    var el = document.createElement('div');
+    el.className = 'kpi';
+    el.innerHTML =
+      '<div class="kpi-label">'+k.label+'</div>'+
+      '<div class="kpi-value">'+k.value+' <small>'+k.unit+'</small></div>'+
+      '<div class="kpi-sub">'+k.delta+'</div>';
+    kpiGrid.appendChild(el);
+  });
+
+  /* ================= DONUT: capacity mix ================= */
+  var mix = [
+    { label:'Coal & lignite', value:226.23, color:tok('--s1') },
+    { label:'Solar', value:150.00, color:tok('--s2') },
+    { label:'Wind', value:56.00, color:tok('--s3') },
+    { label:'Large hydro', value:51.00, color:tok('--s4') },
+    { label:'Other RE & storage', value:20.61, color:tok('--s5') },
+    { label:'Gas', value:20.12, color:tok('--s6') },
+    { label:'Nuclear', value:8.78, color:tok('--s7') }
+  ];
+  var total = mix.reduce(function(a,b){return a+b.value;},0);
+
+  (function renderDonut(){
+    var svg = document.getElementById('donutSvg');
+    var cx=86, cy=86, r=66, sw=24;
+    var circ = 2*Math.PI*r;
+    var gapDeg = 2; // visual gap in degrees between segments
+    var startAngle = -90;
+    var ns = 'http://www.w3.org/2000/svg';
+    mix.forEach(function(seg){
+      var frac = seg.value/total;
+      var segDeg = frac*360;
+      var drawDeg = Math.max(segDeg-gapDeg, 0.5);
+      var dash = (drawDeg/360)*circ;
+      var circle = document.createElementNS(ns,'circle');
+      circle.setAttribute('cx',cx); circle.setAttribute('cy',cy); circle.setAttribute('r',r);
+      circle.setAttribute('fill','none');
+      circle.setAttribute('stroke', seg.color);
+      circle.setAttribute('stroke-width', sw);
+      circle.setAttribute('stroke-linecap','round');
+      circle.setAttribute('stroke-dasharray', dash+' '+(circ-dash));
+      circle.setAttribute('transform','rotate('+startAngle+' '+cx+' '+cy+')');
+      circle.style.cursor='pointer';
+      circle.addEventListener('mousemove', function(e){
+        showTip(e, '<b>'+seg.label+'</b><br><span class="tt-lbl">Capacity</span> '+fmt(seg.value)+' GW &nbsp;·&nbsp; '+fmt(seg.value/total*100)+'%');
+      });
+      circle.addEventListener('mouseleave', hideTip);
+      svg.appendChild(circle);
+      startAngle += segDeg;
+    });
+    var t1 = document.createElementNS(ns,'text');
+    t1.setAttribute('x',cx); t1.setAttribute('y',cy-4); t1.setAttribute('text-anchor','middle');
+    t1.setAttribute('class','donut-center-val'); t1.textContent = fmt(total,1);
+    svg.appendChild(t1);
+    var t2 = document.createElementNS(ns,'text');
+    t2.setAttribute('x',cx); t2.setAttribute('y',cy+13); t2.setAttribute('text-anchor','middle');
+    t2.setAttribute('class','donut-center-lbl'); t2.textContent = 'GW TOTAL';
+    svg.appendChild(t2);
+  })();
+
+  (function renderDonutLegend(){
+    var wrap = document.getElementById('donutLegend');
+    mix.forEach(function(seg){
+      var row = document.createElement('div');
+      row.className = 'legend-row';
+      row.innerHTML =
+        '<span class="swatch" style="background:'+seg.color+'"></span>'+
+        '<span class="legend-label">'+seg.label+'</span>'+
+        '<span class="legend-val">'+fmt(seg.value)+' GW</span>'+
+        '<span class="legend-pct">'+fmt(seg.value/total*100)+'%</span>';
+      wrap.appendChild(row);
+    });
+  })();
+
+  /* ================= REGIONAL bars ================= */
+  var regions = [
+    { name:'Northern', capacity:149.69, demand:91.2 },
+    { name:'Western', capacity:173.07, demand:82.9 },
+    { name:'Southern', capacity:142.80, demand:69.9 },
+    { name:'Eastern & North-Eastern', capacity:67.18, demand:37.6 }
+  ];
+  var maxRegionVal = Math.max.apply(null, regions.map(function(r){return Math.max(r.capacity,r.demand);}));
+
+  (function renderRegions(){
+    var wrap = document.getElementById('regionBlocks');
+    regions.forEach(function(r){
+      var block = document.createElement('div');
+      block.className = 'region-block';
+      var capPct = (r.capacity/maxRegionVal*100).toFixed(1);
+      var demPct = (r.demand/maxRegionVal*100).toFixed(1);
+      block.innerHTML =
+        '<div class="region-name">'+r.name+'</div>'+
+        '<div class="hbar-row"><span class="hbar-label">Capacity</span><div class="hbar-track"><div class="hbar-fill" style="width:'+capPct+'%;background:var(--s1)"></div></div><span class="hbar-value">'+fmt(r.capacity)+' GW</span></div>'+
+        '<div class="hbar-row"><span class="hbar-label">Peak demand</span><div class="hbar-track"><div class="hbar-fill" style="width:'+demPct+'%;background:var(--s2)"></div></div><span class="hbar-value">'+fmt(r.demand)+' GW</span></div>';
+      wrap.appendChild(block);
+    });
+  })();
+
+  /* ================= LINE CHART: national demand 2026 ================= */
+  var demandPts = [
+    { date:'2026-01-31', label:'Jan', value:245.4 },
+    { date:'2026-02-28', label:'Feb', value:212.5 },
+    { date:'2026-04-25', label:'Apr', value:256.1, record:true, note:'All-time record (25 Apr)' },
+    { date:'2026-05-21', label:'May', value:270.7, record:true, note:'All-time record (21 May)' },
+    { date:'2026-06-30', label:'Jun', value:264.8 },
+    { date:'2026-07-31', label:'Jul', value:270.3 }
+  ];
+
+  (function renderLine(){
+    var svg = document.getElementById('lineSvg');
+    var W=900, H=300, padL=44, padR=24, padT=28, padB=36;
+    var yMin=190, yMax=285;
+    var yearStart = new Date('2026-01-01').getTime();
+    var yearMs = 365*24*3600*1000;
+
+    function xFor(dateStr){
+      var frac = (new Date(dateStr).getTime()-yearStart)/yearMs;
+      return padL + frac*(W-padL-padR);
+    }
+    function yFor(v){
+      return padT + (1-(v-yMin)/(yMax-yMin))*(H-padT-padB);
+    }
+
+    var ns='http://www.w3.org/2000/svg';
+    var defs = document.createElementNS(ns,'defs');
+    defs.innerHTML = '<linearGradient id="lineFade" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="'+tok('--s1')+'" stop-opacity="0.22"/>' +
+      '<stop offset="100%" stop-color="'+tok('--s1')+'" stop-opacity="0"/>' +
+      '</linearGradient>';
+    svg.appendChild(defs);
+
+    // gridlines + y ticks
+    var yTicks = [190,210,230,250,270];
+    yTicks.forEach(function(t){
+      var y = yFor(t);
+      var line = document.createElementNS(ns,'line');
+      line.setAttribute('x1',padL); line.setAttribute('x2',W-padR);
+      line.setAttribute('y1',y); line.setAttribute('y2',y);
+      line.setAttribute('class','line-gridline');
+      svg.appendChild(line);
+      var txt = document.createElementNS(ns,'text');
+      txt.setAttribute('x', padL-10); txt.setAttribute('y', y+3.5);
+      txt.setAttribute('text-anchor','end'); txt.setAttribute('class','line-tick');
+      txt.textContent = t;
+      svg.appendChild(txt);
+    });
+
+    // month labels along x
+    demandPts.forEach(function(p){
+      var x = xFor(p.date);
+      var txt = document.createElementNS(ns,'text');
+      txt.setAttribute('x', x); txt.setAttribute('y', H-padB+22);
+      txt.setAttribute('text-anchor','middle'); txt.setAttribute('class','line-tick');
+      txt.textContent = p.label;
+      svg.appendChild(txt);
+    });
+
+    // area
+    var areaD = 'M '+xFor(demandPts[0].date)+' '+yFor(yMin);
+    demandPts.forEach(function(p){ areaD += ' L '+xFor(p.date)+' '+yFor(p.value); });
+    areaD += ' L '+xFor(demandPts[demandPts.length-1].date)+' '+yFor(yMin)+' Z';
+    var area = document.createElementNS(ns,'path');
+    area.setAttribute('d', areaD); area.setAttribute('class','line-area');
+    svg.appendChild(area);
+
+    // line
+    var lineD = demandPts.map(function(p,i){
+      return (i===0?'M ':'L ') + xFor(p.date) + ' ' + yFor(p.value);
+    }).join(' ');
+    var path = document.createElementNS(ns,'path');
+    path.setAttribute('d', lineD); path.setAttribute('class','line-path');
+    svg.appendChild(path);
+
+    // markers
+    demandPts.forEach(function(p){
+      var x = xFor(p.date), y = yFor(p.value);
+      var c = document.createElementNS(ns,'circle');
+      c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r', p.record?6:5);
+      c.setAttribute('class','line-marker'+(p.record?' record':''));
+      c.addEventListener('mousemove', function(e){
+        showTip(e, '<b>'+fmt(p.value)+' GW</b><br><span class="tt-lbl">'+p.label+' 2026</span>'+(p.note?'<br><span class="tt-lbl">'+p.note+'</span>':''));
+      });
+      c.addEventListener('mouseleave', hideTip);
+      svg.appendChild(c);
+
+      if(p.record){
+        var lbl = document.createElementNS(ns,'text');
+        lbl.setAttribute('x', x); lbl.setAttribute('y', y-14);
+        lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('class','line-annot');
+        lbl.textContent = fmt(p.value)+' GW';
+        svg.appendChild(lbl);
+      }
+    });
+  })();
+
+  /* ================= mini bars: DAM vs RTM price & volume ================= */
+  function renderPairBars(containerId, items, unitFmt){
+    var wrap = document.getElementById(containerId);
+    var max = Math.max.apply(null, items.map(function(i){return i.value;}));
+    items.forEach(function(it){
+      var row = document.createElement('div');
+      row.className = 'hbar-row';
+      var pct = (it.value/max*100).toFixed(1);
+      row.innerHTML =
+        '<span class="hbar-label">'+it.label+'</span>'+
+        '<div class="hbar-track"><div class="hbar-fill" style="width:'+pct+'%;background:'+it.color+'"></div></div>'+
+        '<span class="hbar-value">'+unitFmt(it.value)+'</span>';
+      wrap.appendChild(row);
+    });
+  }
+  renderPairBars('priceBars', [
+    { label:'DAM', value:4.99, color:tok('--s1') },
+    { label:'RTM', value:4.41, color:tok('--s2') }
+  ], function(v){ return '₹'+fmt(v,2); });
+
+  renderPairBars('volBars', [
+    { label:'DAM', value:5087, color:tok('--s1') },
+    { label:'RTM', value:5631, color:tok('--s2') }
+  ], function(v){ return fmt(v,0); });
+
+  renderPairBars('bidBars', [
+    { label:'Purchase', value:620650, color:tok('--critical') },
+    { label:'Sell', value:307981, color:tok('--good') }
+  ], function(v){ return fmt(v,0); });
+
+  renderPairBars('addBars', [
+    { label:'Solar', value:44.6, color:tok('--s2') },
+    { label:'Wind', value:6.1, color:tok('--s3') },
+    { label:'Other RE', value:3.9, color:tok('--s5') }
+  ], function(v){ return fmt(v,1)+' GW'; });
+
+  /* ================= gauge: today's price range ================= */
+  (function renderGauge(){
+    var track = document.getElementById('gaugeTrack');
+    var min=1.86, max=10.00, avg=7.30;
+    function pct(v){ return ((v-min)/(max-min)*100).toFixed(1)+'%'; }
+    var mMin = document.createElement('div');
+    mMin.className='gauge-marker'; mMin.style.left='0%'; mMin.setAttribute('data-label','Min ₹1.86');
+    var mMax = document.createElement('div');
+    mMax.className='gauge-marker'; mMax.style.left='100%'; mMax.setAttribute('data-label','Max ₹10.00');
+    var mAvg = document.createElement('div');
+    mAvg.className='gauge-marker avg'; mAvg.style.left=pct(avg); mAvg.setAttribute('data-label','Avg ₹7.30');
+    track.appendChild(mMin); track.appendChild(mMax); track.appendChild(mAvg);
+  })();
+
+})();
+</script>
