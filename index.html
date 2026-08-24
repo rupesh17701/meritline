@@ -200,14 +200,6 @@
     letter-spacing:-0.01em;
   }
   .kpi-value small{ font-size:14px; font-weight:500; color:var(--text-secondary); }
-  .kpi-delta{
-    font-size:12px;
-    display:inline-flex; align-items:center; gap:4px;
-    font-weight:500;
-  }
-  .kpi-delta.up{ color:var(--critical); }
-  .kpi-delta.down{ color:var(--good); }
-  .kpi-delta.flat{ color:var(--text-muted); }
   .kpi-sub{ font-size:12px; color:var(--text-muted); line-height:1.4; }
 
   /* ---------- charts grid ---------- */
@@ -335,6 +327,28 @@
   @media (max-width:520px){ .pair-block{ grid-template-columns:1fr; } }
   .pair-title{ font-size:11.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:10px; font-weight:500; }
 
+  /* ---------- merit-order stack ---------- */
+  .merit-toggle{ display:inline-flex; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:3px; gap:2px; }
+  .merit-toggle button{
+    font-family:"IBM Plex Sans", sans-serif; font-size:12.5px; font-weight:500;
+    border:none; background:transparent; color:var(--text-secondary);
+    padding:7px 13px; border-radius:6px; cursor:pointer;
+  }
+  .merit-toggle button.active{ background:var(--surface); color:var(--text-primary); box-shadow:0 1px 3px rgba(16,24,40,0.10); font-weight:600; }
+  .merit-toggle button:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+  .merit-seg{ cursor:pointer; }
+  .merit-seg-label{ font-family:"IBM Plex Mono", monospace; font-size:10px; fill:var(--text-secondary); }
+  .merit-tick{ font-family:"IBM Plex Mono", monospace; font-size:10.5px; fill:var(--text-muted); }
+  .merit-gridline{ stroke:var(--grid-line); stroke-width:1; }
+  .merit-demand-line{ stroke:var(--critical); stroke-width:1.75; stroke-dasharray:4 3; }
+  .merit-demand-label{ font-family:"IBM Plex Mono", monospace; font-size:11px; font-weight:600; fill:var(--critical); }
+  .merit-caption{
+    margin-top:16px; padding:13px 15px; border-radius:10px;
+    background:var(--accent-wash); border:1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    font-size:13px; line-height:1.55; color:var(--text-primary);
+  }
+  .merit-caption b{ color:var(--accent-strong); }
+
   /* ---------- insights ---------- */
   .insights-card{
     background:var(--surface);
@@ -395,6 +409,7 @@
         Meritline
       </div>
       <div class="brand-tag">An independent market brief on India's power sector — generation mix, demand, and exchange pricing, compiled from public disclosures.</div>
+      <div class="brand-tag" style="font-size:11.5px; color:var(--text-muted);" id="bylineSlot">Prepared by [Your name] — aspiring power market analyst</div>
     </div>
     <div class="topbar-right">
       <span class="live-badge"><span class="live-dot"></span> IEX Day-Ahead — Live</span>
@@ -404,6 +419,23 @@
 
   <div class="section-head"><h2>Market Snapshot</h2><span class="section-note">National, FY 2025–26 unless noted</span></div>
   <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="section-head"><h2>Original Analysis</h2><span class="section-note">Modeled, not reported</span></div>
+  <div class="card full" style="margin-bottom:16px;">
+    <div class="card-head" style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+      <div>
+        <h3 class="card-title">Merit-order stack: why the price spikes after sunset</h3>
+        <div class="card-sub" style="max-width:56ch;">An indicative supply stack, cheapest source first — showing where record demand draws from, and how that shifts once ~150 GW of solar drops off the grid each evening.</div>
+      </div>
+      <div class="merit-toggle" role="tablist" aria-label="Merit-order scenario">
+        <button type="button" id="btnDay" class="active" aria-pressed="true">Daytime — full nameplate</button>
+        <button type="button" id="btnEve" aria-pressed="false">Evening — solar off</button>
+      </div>
+    </div>
+    <svg class="line-svg" viewBox="0 0 900 260" id="meritSvg"></svg>
+    <div class="merit-caption" id="meritCaption"></div>
+    <div class="footnote">Illustrative model: sources stacked in ascending indicative variable-cost order (solar/wind and hydro are must-run/near-zero marginal cost; nuclear is a low-cost regulated baseload; coal uses CERC-reported all-India rate-of-sale ₹4.36–4.58/kWh for existing plants and ₹5.38–6.30/kWh for new competitively-bid plants; gas uses indicative variable cost of ₹7–12/kWh against a CERC ceiling of ₹12/unit). Demand reference is the FY 2025–26 all-time peak (270.7 GW) applied as a stress test to both scenarios, not a claim about the actual hour it occurred. The IEX price is a thin, residual marginal market — not the whole system's average cost — which is why it can print above what this stack alone implies.</div>
+  </div>
 
   <div class="section-head"><h2>Generation &amp; Grid</h2><span class="section-note">Installed capacity as of 31 Mar 2026</span></div>
   <div class="charts-grid">
@@ -537,11 +569,11 @@
 
   /* ================= KPI STRIP ================= */
   var kpis = [
-    { label:'All-time peak demand', value:'270.7', unit:'GW', delta:'21 May 2026 · heatwave record', deltaClass:'flat' },
-    { label:'Installed capacity', value:'532.7', unit:'GW', delta:'+65 GW added in FY25–26', deltaClass:'down' },
-    { label:'Non-fossil share', value:'53.2', unit:'%', delta:'crossed 50% in Jun 2025', deltaClass:'down' },
-    { label:'Energy shortage, FY25–26', value:'0.03', unit:'%', delta:'national average', deltaClass:'flat' },
-    { label:'Live DAM price', value:'₹7.30', unit:'/unit', delta:'vs ₹4.99 Jul avg', deltaClass:'up' }
+    { label:'All-time peak demand', value:'270.7', unit:'GW', delta:'21 May 2026 · heatwave record' },
+    { label:'Installed capacity', value:'532.7', unit:'GW', delta:'+65 GW added in FY25–26' },
+    { label:'Non-fossil share', value:'53.2', unit:'%', delta:'crossed 50% in Jun 2025' },
+    { label:'Energy shortage, FY25–26', value:'0.03', unit:'%', delta:'national average' },
+    { label:'Live DAM price', value:'₹7.30', unit:'/unit', delta:'vs ₹4.99 Jul avg' }
   ];
   var kpiGrid = document.getElementById('kpiGrid');
   kpis.forEach(function(k){
@@ -788,6 +820,125 @@
     mAvg.className='gauge-marker avg'; mAvg.style.left=pct(avg); mAvg.setAttribute('data-label','Avg ₹7.30');
     track.appendChild(mMin); track.appendChild(mMax); track.appendChild(mAvg);
   })();
+
+  /* ================= MERIT-ORDER STACK ================= */
+  var meritScenarios = {
+    day: {
+      label:'Daytime',
+      segs:[
+        { name:'Solar + Wind', cap:206.00, cost:0.3, range:'~₹0–0.5/kWh · must-run', color:tok('--s3') },
+        { name:'Large hydro', cap:51.00, cost:1.5, range:'~₹1–2/kWh · indicative', color:tok('--s1') },
+        { name:'Nuclear', cap:8.78, cost:3.5, range:'~₹3–4/kWh · regulated baseload', color:tok('--s7') },
+        { name:'Coal', cap:226.23, cost:5.3, range:'₹4.36–6.30/kWh · CERC rate of sale', color:tok('--s2') },
+        { name:'Gas', cap:20.12, cost:9.5, range:'~₹7–12/kWh · CERC ceiling ₹12', color:tok('--s6') }
+      ]
+    },
+    eve: {
+      label:'Evening',
+      segs:[
+        { name:'Wind only', cap:56.00, cost:0.3, range:'~₹0–0.5/kWh · must-run (solar = 0)', color:tok('--s3') },
+        { name:'Large hydro', cap:51.00, cost:1.5, range:'~₹1–2/kWh · indicative', color:tok('--s1') },
+        { name:'Nuclear', cap:8.78, cost:3.5, range:'~₹3–4/kWh · regulated baseload', color:tok('--s7') },
+        { name:'Coal', cap:226.23, cost:5.3, range:'₹4.36–6.30/kWh · CERC rate of sale', color:tok('--s2') },
+        { name:'Gas', cap:20.12, cost:9.5, range:'~₹7–12/kWh · CERC ceiling ₹12', color:tok('--s6') }
+      ]
+    }
+  };
+  var DEMAND_REF = 270.7;
+
+  function renderMerit(key){
+    var svg = document.getElementById('meritSvg');
+    svg.innerHTML = '';
+    var scen = meritScenarios[key];
+    var W=900, H=260, padL=44, padR=24, padT=18, padB=34;
+    var xMax = 520, yMax = 12;
+    function xFor(v){ return padL + (v/xMax)*(W-padL-padR); }
+    function yFor(v){ return padT + (1-(v/yMax))*(H-padT-padB); }
+    var ns='http://www.w3.org/2000/svg';
+
+    // gridlines
+    [0,3,6,9,12].forEach(function(t){
+      var y=yFor(t);
+      var l=document.createElementNS(ns,'line');
+      l.setAttribute('x1',padL); l.setAttribute('x2',W-padR); l.setAttribute('y1',y); l.setAttribute('y2',y);
+      l.setAttribute('class','merit-gridline'); svg.appendChild(l);
+      var tx=document.createElementNS(ns,'text');
+      tx.setAttribute('x',padL-8); tx.setAttribute('y',y+3.5); tx.setAttribute('text-anchor','end');
+      tx.setAttribute('class','merit-tick'); tx.textContent='₹'+t;
+      svg.appendChild(tx);
+    });
+    var baseline=document.createElementNS(ns,'line');
+    baseline.setAttribute('x1',padL); baseline.setAttribute('x2',W-padR);
+    baseline.setAttribute('y1',yFor(0)); baseline.setAttribute('y2',yFor(0));
+    baseline.setAttribute('stroke', tok('--border-strong')); baseline.setAttribute('stroke-width','1');
+    svg.appendChild(baseline);
+
+    // segments
+    var cum = 0;
+    var demandSeg = null, demandFrac = 0;
+    scen.segs.forEach(function(seg){
+      var x0 = cum, x1 = cum+seg.cap;
+      if(DEMAND_REF > x0 && DEMAND_REF <= x1){ demandSeg = seg; demandFrac = (DEMAND_REF-x0)/seg.cap; }
+      var rx0 = xFor(x0), rx1 = xFor(x1);
+      var rect = document.createElementNS(ns,'rect');
+      rect.setAttribute('x', rx0+1); rect.setAttribute('y', yFor(seg.cost));
+      rect.setAttribute('width', Math.max(rx1-rx0-2,0)); rect.setAttribute('height', yFor(0)-yFor(seg.cost));
+      rect.setAttribute('rx', 3); rect.setAttribute('fill', seg.color); rect.setAttribute('class','merit-seg');
+      rect.addEventListener('mousemove', function(e){
+        showTip(e, '<b>'+seg.name+'</b><br><span class="tt-lbl">'+fmt(seg.cap,1)+' GW · '+seg.range+'</span>');
+      });
+      rect.addEventListener('mouseleave', hideTip);
+      svg.appendChild(rect);
+
+      if(rx1-rx0 > 46){
+        var lbl=document.createElementNS(ns,'text');
+        lbl.setAttribute('x', (rx0+rx1)/2); lbl.setAttribute('y', yFor(seg.cost)-7);
+        lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('class','merit-seg-label');
+        lbl.textContent = seg.name;
+        svg.appendChild(lbl);
+      }
+      cum = x1;
+    });
+
+    // demand reference line
+    var dx = xFor(DEMAND_REF);
+    var dline=document.createElementNS(ns,'line');
+    dline.setAttribute('x1',dx); dline.setAttribute('x2',dx);
+    dline.setAttribute('y1',padT); dline.setAttribute('y2',yFor(0));
+    dline.setAttribute('class','merit-demand-line');
+    svg.appendChild(dline);
+    var dlabel=document.createElementNS(ns,'text');
+    dlabel.setAttribute('x',dx+7); dlabel.setAttribute('y',padT+11);
+    dlabel.setAttribute('class','merit-demand-label');
+    dlabel.textContent = 'Peak demand · '+fmt(DEMAND_REF,1)+' GW';
+    svg.appendChild(dlabel);
+
+    // x axis end tick
+    var endTxt=document.createElementNS(ns,'text');
+    endTxt.setAttribute('x',W-padR); endTxt.setAttribute('y',H-padB+18);
+    endTxt.setAttribute('text-anchor','end'); endTxt.setAttribute('class','merit-tick');
+    endTxt.textContent='Cumulative capacity (GW) →';
+    svg.appendChild(endTxt);
+
+    // caption
+    var cap = document.getElementById('meritCaption');
+    if(demandSeg){
+      var pctIn = (demandFrac*100).toFixed(0);
+      cap.innerHTML = scen.label+' scenario: at '+fmt(DEMAND_REF,1)+' GW of demand, the stack has drawn <b>'+pctIn+'% of the way into the '+demandSeg.name+' band</b> ('+demandSeg.range+') — that\'s the indicative marginal source setting price in this scenario.';
+    }
+  }
+
+  document.getElementById('btnDay').addEventListener('click', function(){
+    this.classList.add('active'); this.setAttribute('aria-pressed','true');
+    var e=document.getElementById('btnEve'); e.classList.remove('active'); e.setAttribute('aria-pressed','false');
+    renderMerit('day');
+  });
+  document.getElementById('btnEve').addEventListener('click', function(){
+    this.classList.add('active'); this.setAttribute('aria-pressed','true');
+    var d=document.getElementById('btnDay'); d.classList.remove('active'); d.setAttribute('aria-pressed','false');
+    renderMerit('eve');
+  });
+  renderMerit('day');
 
 })();
 </script>
